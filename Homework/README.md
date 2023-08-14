@@ -38,3 +38,5 @@ To deploy the collaborative homework diary on the Internet Computer, follow thes
 4. Choose "Deploy Canister."
 5. Set a name for your canister and click "Deploy."
 6. Wait for the deployment to complete and receive the canister ID and URL.
+
+For detailed explanations of the functionalities and code components, refer to the provided code comments.
