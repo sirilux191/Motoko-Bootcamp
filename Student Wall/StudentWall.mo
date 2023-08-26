@@ -4,8 +4,15 @@ import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
 import Hash "mo:base/Hash";
 import Result "mo:base/Result";
+import Buffer "mo:base/Buffer";
+import Order "mo:base/Order";
+import Iter "mo:base/Iter";
+import Array "mo:base/Array";
 
 actor class studentWall (){
+
+    type Order = Order.Order;
+
     public type Content = {
       #Text: Text;
       #Image: Blob;
@@ -73,5 +80,83 @@ actor class studentWall (){
             return #ok();
         };
 
+    };
+
+    public func deleteMessage (messageId: Nat) : async Result.Result<(), Text>{
+        if(messageId > messageID){
+            #err("Invalid Message ID")
+        }else{
+            ignore wall.remove(messageId);
+            #ok() 
+        };
+    };
+
+    public func upVote (messageId: Nat): async Result.Result<(), Text>{
+        if (messageId > messageID){
+            return #err("Invalid Message ID");
+        }else{
+            let tempMessage = wall.get(messageId);
+            switch (tempMessage){
+                case (null){
+                    return #err("Message is Null");
+                };
+                case (?tempMessage){
+                    let newmessage= {
+                        vote = 1 + tempMessage.vote;
+                        content = tempMessage.content;
+                        creator = tempMessage.creator;
+                    };
+                    wall.put(messageId, newmessage);
+                }
+            };
+            return #ok();
+        }
+    };
+
+    public func downVote (messageId  : Nat) : async Result.Result<(), Text>{
+                if (messageId > messageID){
+            return #err("Invalid Message ID");
+        }else{
+            let tempMessage = wall.get(messageId);
+            switch (tempMessage){
+                case (null){
+                    return #err("Message is Null");
+                };
+                case (?tempMessage){
+                    let newmessage= {
+                        vote = tempMessage.vote - 1;
+                        content = tempMessage.content;
+                        creator = tempMessage.creator;
+                    };
+                    wall.put(messageId, newmessage);
+                }
+            };
+            return #ok();
+        }
+    };
+
+    public query func getAllMessages  () : async [Message]{
+        let buff = Buffer.Buffer<Message>(1);
+
+        for (value in wall.vals()) {
+            buff.add(value);
+        };
+
+        Buffer.toArray(buff);
+    };
+
+    func compareMessage(m1: Message, m2: Message) : Order {
+        if (m1.vote == m2.vote){
+           return #equal;
+        }else if (m1.vote > m2. vote) {
+            return #less;
+        }else{
+            return #greater;
+        }
+    };
+
+    public query func getAllMessagesRanked  () : async [Message]{
+        let tempArray : [Message] = Iter.toArray(wall.vals());
+        return Array.sort<Message>(tempArray, compareMessage);
     };
 }
